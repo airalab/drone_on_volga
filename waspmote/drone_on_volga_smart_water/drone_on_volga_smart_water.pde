@@ -1,9 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  Water parameters monitoring sensor firmware
  *  For Libelium Plug&Sense Smart Water
  *  2018, Alisher Khassanov <alisher@aira.life>
  *  BSD 3-Clause License
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 
  *  Wiring
  *  - PTSM     : Temperature Sensor (Pt-1000)
@@ -16,10 +16,10 @@
  *  
  *  Calibration
  *  - Sensors works since July 2018
- *  - Latest calibration 03.08.2018
- *  - Latest check 03.08.2018
+ *  - Latest calibration 21.04.2019
+ *  - Latest check 21.04.2019
  *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <WaspSensorSW.h>
 #include <WaspFrame.h>
@@ -27,22 +27,22 @@
 char node_ID[] = "DOV01SW";
 
 // pH Sensor calibration values
-#define cal_point_10 1.954 // at 27.980 toC
-#define cal_point_7 2.073  // at 28.167 toC
-#define cal_point_4 2.240  // at 28.135 toC
-#define cal_temp 28.094    // Temperature at which calibration was carried out
+#define cal_point_10 1.987 // at 27.980 toC
+#define cal_point_7 2.083 // at 28.167 toC
+#define cal_point_4 2.201 // at 28.135 toC
+#define cal_temp 25.963 // Temperature at which calibration was carried out
 
 // Dissolved Oxygen (DO) Sensor calibration values
-#define air_calibration 4.092   //  In normal air
-#define zero_calibration 0.00067 // Calibration of the sensor under 0% solution
+#define air_calibration 3.840 //  In normal air
+#define zero_calibration 0.156 // Calibration of the sensor under 0% solution
 
 // Conductivity Sensor calibration values
 #define point1_cond 12880 // Value 1 used to calibrate the sensor
 //#define point2_cond 80000 // Value 2 used to calibrate the sensor
-#define point2_cond 84 // Value 2 used to calibrate the sensor
-#define point1_cal 103.519 // Point 1 of the calibration
+#define point2_cond 1413 // Value 2 used to calibrate the sensor
+#define point1_cal 116.480// Point 1 of the calibration
 //#define point2_cal 33.18 // Point 2 of the calibration
-#define point2_cal 8255.698 // Point 2 of the calibration
+#define point2_cal 790.500 // Point 2 of the calibration
 
 pHClass pHSensor;
 DOClass DOSensor;
@@ -90,6 +90,4 @@ void loop()
   frame.addSensor(SENSOR_WATER_COND, value_cond_calculated); // muS/cm
 
   USB.println((char*) frame.buffer);
-
-  delay(2000);
 }
