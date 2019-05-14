@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Standart, System and Third party
+from collections import namedtuple
+from queue import Queue
+from threading import Thread
+
+# ROS
+import rospy
+from std_msgs.msg import String
+from std_srvs.srv import Empty
+
+# AIRA
+from robonomics_liability.objective import Objective
+from robonomics_liability.msg import Liability
+from robonomics_liability.srv import StartLiability, StartLiabilityRequest
+from robonomics_liability.srv import FinishLiability, FinishLiabilityRequest
+
+
+class WorkerNode:
+    liability_queue = Queue()
+    in_process = False
+
+    def __init__(self):
+        rospy.init_node('worker')
+        rospy.loginfo('Launching worker node...')
+
+        rospy.Subscriber('/liability/ready', Liability, self.on_new_liability)
+        rospy.Subscriber('next_liability', Liability, self.subscribe_and_start)
+        self.next_liability = rospy.Publisher('next_liability', Liability, queue_size=128)
+
+        rospy.wait_for_service('liability/finish')
+        self.liability_proxy = namedtuple('liability_srvs_proxy', ['start', 'finish'])(
+                                          rospy.ServiceProxy('liability/start', StartLiability),
+                                          rospy.ServiceProxy('liability/finish', FinishLiability))
+
+        rospy.loginfo('Worker node launched.')
+
+    def on_new_liability(self, msg):
+        self.liability_queue.put(msg)
+        rospy.loginfo("Got new liability %s", msg.address)
+
+    def _process_liability_queue(self):
+        while not rospy.is_shutdown() and not self.in_process:
+            msg = self.liability_queue.get()
+            self.next_liability.publish(msg)
+
+    def subscribe_and_start(self, liability):
+        rospy.loginfo('Starting process...')
+
+        objective = Objective(multihash=liability.objective)
+
+        self.in_process = True
+        self.liability_proxy.start(liability.address.address)
+
+        Thread(target=self.work, args=(liability, objective,), daemon=True).start()
+
+    def spin(self):
+        Thread(target=self._process_liability_queue, daemon=True).start()
+        rospy.spin()
+
+    def work(self, liability, objective):
+        rospy.loginfo('Starting new job...')
+        # job execution
+        self.liability_proxy.finish(liability.address.address, True)
+        rospy.loginfo('Jobs done.')
+        self.in_process = False
+
+if __name__ == '__main__':
+    WorkerNode().spin()
