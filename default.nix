@@ -2,6 +2,7 @@
 , python3Packages
 , mkRosPackage
 , robonomics_comm 
+, robonomics_comm-nightly
 }:
 
 mkRosPackage rec {
@@ -12,7 +13,7 @@ mkRosPackage rec {
   src = ./.;
 
   propagatedBuildInputs = [
-    robonomics_comm
+    robonomics_comm-nightly
   ];
 
   meta = with stdenv.lib; {
