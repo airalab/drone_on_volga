@@ -1,0 +1,27 @@
+Drone on Volga mission Robonomics model
+=======================================
+
+This model to order measurement mission from Drone on Volga surface vehicle.
+Vessel could navigate near Togliatti city shore.
+Vessel execute mission by given waypoints and with sensors specified by customer.
+Virtual missions possible to use previously measured data.
+
+Expected objective
+------------------
+
+| Topic       | Message Type | Description |
+| ------------| ------------ | ----------- |
+| /waypoints  | std_msgs/String | A string consists IPFS hash of mission waypoints file aquired from APM Planner to execute by navigation and motion control system |
+| /sensors    | std_msgs/String | Comma separated list of sensors to use. Possible values: Temperature, pH, Dissolved Oxygen, Conductivity, Cu2+, NO3-, NO2-, NH4+ |
+| /virtual    | std_msgs/Bool | If False, means robot must execute this mission after liability contract issued. If True, robot could simulate mission and provide previously measured data |
+| /expiration | std_msgs/Duration | Historical data expiration time for virtual missions. If robot have measurements made after (Liability Contract Block Time - Experation) time it could use it for virtual missions |
+
+Expected result
+---------------
+
+| Topic         | Message Type | Description |
+| ------------- | ------------ | ----------- |
+| /geo          | std_msgs/String | Actual geoposition |
+| /sensors      | std_msgs/String | WaspFrame format string with values measured |
+| /geo_file     | std_msgs/String | For virtual missions. A string consists IPFS hash of geopositioning log file. Could be rosbag or raw text file with EOL separated strings with <epoch time> <geoposition> pairs |
+| /sensors_file | std_msgs/String | For virtual missions. A string consists IPFS hash of sensors log file. Could be rosbag or raw text file with EOL separated WaspFrame format strings with <epoch time> <values measured> paris |
