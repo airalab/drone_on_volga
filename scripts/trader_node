@@ -29,6 +29,8 @@ class TraderNode:
         rospy.Subscriber('/liability/infochan/incoming/demand', Demand, self.on_incoming_demand)
         rospy.Subscriber('/liability/infochan/incoming/offer', Offer, self.on_incoming_offer)
 
+        self.make_offer(Multihash(multihash='Qmea8XkcSXmvLDKES7D886pfimsWh9Vjh1ZJsoHm9MWG4C'), UInt256(uint256='100000000000000000')) # to publish an offer
+
         rospy.loginfo('Trader node launched.')
 
     def act(self, incoming):
@@ -37,22 +39,10 @@ class TraderNode:
             self.make_offer(incoming.objective, incoming.cost) # to publish an offer
 
     def on_incoming_demand(self, incoming: Demand):
-        rospy.loginfo('Incoming demand %s...', str(incoming)
-        if (incoming.model.multihash == rospy.get_param('~model') and
-            incoming.token.address == rospy.get_param('~token')):
-            rospy.loginfo('For my model and token!')
-            self.act(incoming) # reactive strategy
-        else:
-            rospy.loginfo('Not fits my model or token, skip it.')
+        rospy.loginfo('Incoming demand %s...', str(incoming))
 
     def on_incoming_offer(self, incoming: Offer):
         rospy.loginfo('Incoming offer %s...', str(incoming))
-        if (incoming.model.multihash == rospy.get_param('~model') and
-            incoming.token.address == rospy.get_param('~token')):
-            rospy.loginfo('For my model and token!')
-            self.act(incoming) # reactive strategy
-        else:
-            rospy.loginfo('Not fits my model or token, skip it.')
 
     def make_deadline(self):
         lifetime = int(rospy.get_param('~order_lifetime'))

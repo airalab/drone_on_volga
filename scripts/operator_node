@@ -12,10 +12,10 @@ from std_msgs.msg import String
 from std_srvs.srv import Empty
 
 # AIRA
-from robonomics_liability.objective import Objective
 from robonomics_liability.msg import Liability
 from robonomics_liability.srv import StartLiability, StartLiabilityRequest
 from robonomics_liability.srv import FinishLiability, FinishLiabilityRequest
+from ipfs_common.bag import Bag
 
 
 class WorkerNode:
@@ -49,22 +49,23 @@ class WorkerNode:
     def subscribe_and_start(self, liability):
         rospy.loginfo('Starting process...')
 
-        objective = Objective(multihash=liability.objective)
+        #objective = Bag(multihash=liability.objective)
 
         self.in_process = True
         self.liability_proxy.start(liability.address.address)
 
-        Thread(target=self.work, args=(liability, objective,), daemon=True).start()
+        #Thread(target=self.work, args=(liability, objective,), daemon=True).start()
+        Thread(target=self.work, args=(liability,), daemon=True).start()
 
     def spin(self):
         Thread(target=self._process_liability_queue, daemon=True).start()
         rospy.spin()
 
-    def work(self, liability, objective):
+    def work(self, liability):
         rospy.loginfo('Starting new job...')
         # job execution
-        while not input('Press "q" to complete execution'):
-            pass
+        while not input('Type "finish" to complete execution') == 'finish':
+            rospy.sleep(1)
         self.liability_proxy.finish(liability.address.address, True)
         rospy.loginfo('Jobs done.')
         self.in_process = False

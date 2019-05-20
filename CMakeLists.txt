@@ -16,14 +16,16 @@ catkin_package()
 
 catkin_install_python(
   PROGRAMS
-      #scripts/node
+      scripts/trader_node
+      scripts/pub_demand.py
+      scripts/operator_node
   DESTINATION
     ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(
     FILES
-        #launch/start.launch
+        launch/trader.launch
     DESTINATION
         ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
